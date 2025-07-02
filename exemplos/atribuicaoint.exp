@@ -1,0 +1,6 @@
+namespace main {
+    int x;
+    x = 42;
+    print(x);
+    halt();
+}

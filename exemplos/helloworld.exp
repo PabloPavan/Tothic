@@ -1,0 +1,4 @@
+namespace main {
+    print("Hello World");
+    halt();
+}

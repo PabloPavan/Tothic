@@ -1,0 +1,10 @@
+namespace main {
+    int soma(int a, int b) {
+        int r;
+        r = a + b; 
+        return r;
+    }
+
+    auto resultado = soma(10, 20);
+    print(resultado);
+}

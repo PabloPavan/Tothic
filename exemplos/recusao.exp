@@ -1,0 +1,27 @@
+// namespace main {
+//     int conta(int n) {
+//         if (n == 0) {
+//             print("Fim");
+//             return 0;
+//         } else {
+//             print(n);
+//             auto x = conta(n - 1);
+//         }
+//     }
+
+//     auto x = conta(3);
+//     halt();
+// }
+
+namespace main {
+    int conta(int n) {
+        if (n != 0) {
+            auto y = conta(n - 1);
+        } else {
+          return 1;
+        }
+    }
+    auto x = conta(2);
+    print(x);
+    halt();
+}

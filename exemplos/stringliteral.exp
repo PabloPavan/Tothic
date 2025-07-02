@@ -1,0 +1,7 @@
+namespace main {
+    string msg;
+    msg = "Texto";
+    print(msg);
+    print("Texto");
+    halt();
+}
