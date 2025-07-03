@@ -3,7 +3,7 @@ from contextlib import redirect_stdout
 from main import execute
 
 def compile_and_run(source_code: str) -> None:
-    execute(source_code, True, True, False)
+    execute(source_code, True, False, False)
 
 def simulate_vm_execution(source_code: str) -> str:
     f = io.StringIO()

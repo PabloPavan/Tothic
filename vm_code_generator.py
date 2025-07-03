@@ -1,3 +1,5 @@
+from ast_tree import *
+
 class VMCodeGenerator:
     def __init__(self, tac_instructions, symbol_table):
         self.tac = tac_instructions
@@ -9,7 +11,6 @@ class VMCodeGenerator:
         main_code = []
         function_code = []
         current = main_code
-        self.allocated = set()
 
         for instr in self.tac:
 
@@ -18,13 +19,15 @@ class VMCodeGenerator:
                 current.append(("LABEL", instr.result))
 
             elif instr.op == 'arg':
-                current.append(("LOAD", instr.arg1))
+                if isinstance(instr.arg1, Literal):
+                    current.append(("PUSH", instr.arg1.value))
+                elif isinstance(instr.arg1, VarRef):
+                    current.append(("LOAD", instr.arg1.name))
+                else:
+                    current.append(("LOAD", instr.arg1))
 
             elif instr.op == 'call':
                 current.append(("CALL", instr.arg1))
-                if instr.result and instr.result not in self.allocated:
-                    current.append(("ALLOC", instr.result))
-                    self.allocated.add(instr.result)
                 current.append(("STORE", instr.result))
                 arg_stack.clear()
 
@@ -43,9 +46,6 @@ class VMCodeGenerator:
                 else:
                     current.append(("LOAD", instr.arg1))
 
-                if instr.result and instr.result not in self.allocated:
-                    current.append(("ALLOC", instr.result))
-                    self.allocated.add(instr.result)
                 current.append(("STORE", instr.result))
 
             elif instr.op in {'+', '-', '*', '/', '==', '!=', '<', '<=', '>', '>='}:
@@ -64,16 +64,10 @@ class VMCodeGenerator:
                     '>=': "GE"
                 }
                 current.append((op_map[instr.op],))
-                if instr.result and instr.result not in self.allocated:
-                    current.append(("ALLOC", instr.result))
-                    self.allocated.add(instr.result)
                 current.append(("STORE", instr.result))
 
             elif instr.op == 'literal_init':
                 current.append(("PUSH", instr.arg1)) 
-                if instr.result and instr.result not in self.allocated:
-                    current.append(("ALLOC", instr.result))
-                    self.allocated.add(instr.result)  
                 current.append(("STORE", instr.result))
 
             elif instr.op == 'alloc':
@@ -82,9 +76,6 @@ class VMCodeGenerator:
             elif instr.op == 'load':
                 current.append(("LOAD_INDEX", instr.arg1, instr.arg2))
 
-                if instr.result and instr.result not in self.allocated:
-                    current.append(("ALLOC", instr.result))
-                    self.allocated.add(instr.result)
                 current.append(("STORE", instr.result))
 
             elif instr.op == 'store':
@@ -101,9 +92,6 @@ class VMCodeGenerator:
                 current.append(("LABEL", f"NOT_{instr.result}"))
 
             elif instr.op == 'param':
-                if instr.result and instr.result not in self.allocated:
-                    current.append(("ALLOC", instr.result))
-                    self.allocated.add(instr.result)
                 current.append(("STORE", instr.result))
 
             elif instr.op == 'PRINT':

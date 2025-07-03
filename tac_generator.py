@@ -102,10 +102,10 @@ class TACGenerator:
         return f"{node.namespace}.{node.name}"
 
     def visit_Literal(self, node):
-        label = self.symbol_table.register_literal(node)
-        self.instructions.append(TACInstruction("alloc", None, None, label))     
-        self.instructions.append(TACInstruction('literal_init', node.value, None, label))  
-        return label
+        # label = self.symbol_table.register_literal(node)
+        # self.instructions.append(TACInstruction("alloc", None, None, label))     
+        # self.instructions.append(TACInstruction('literal_init', node.value, None, label))  
+        return node.value
 
     def visit_TypeCast(self, node):
         value = self.visit(node.expr)
@@ -114,17 +114,29 @@ class TACGenerator:
         return temp
 
     def visit_Call(self, node):
-        arg_temps = [self.visit(arg) for arg in node.args]
-        for arg in arg_temps:
-            self.instructions.append(TACInstruction("arg", arg))
+        for arg in node.args:
+            if isinstance(arg, Literal):
+                self.instructions.append(TACInstruction("arg", arg))  # passa o nó Literal
+            elif isinstance(arg, VarRef):
+                self.instructions.append(TACInstruction("arg", arg))  # passa o nó VarRef
+            else:
+                temp = self.visit(arg)  # para BinaryOp, Call aninhada, etc.
+                self.instructions.append(TACInstruction("arg", temp))
+
         temp = self.temps.new_temp()
-        self.instructions.append(TACInstruction("call", node.name, len(arg_temps), temp))
+        self.instructions.append(TACInstruction("call", node.name, len(node.args), temp))
         return temp
     
     def visit_Print(self, node):
-        arg_temps = [self.visit(arg) for arg in node.args]
-        for arg in arg_temps:
-            self.instructions.append(TACInstruction("arg", arg))
+        for arg in node.args:
+            if isinstance(arg, Literal):
+                self.instructions.append(TACInstruction("arg", arg))  # passa o nó Literal
+            elif isinstance(arg, VarRef):
+                self.instructions.append(TACInstruction("arg", arg))  # passa o nó VarRef
+            else:
+                temp = self.visit(arg)  # para BinaryOp, Call aninhada, etc.
+                self.instructions.append(TACInstruction("arg", temp))
+
         self.instructions.append(TACInstruction("PRINT"))
 
     def visit_Halt(self, node):

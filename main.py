@@ -9,11 +9,16 @@ import sys
 import os
 import argparse
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="Leitor de parâmetros para execução de arquivos .exp")
+import sys
 
-    # Argumento obrigatório: arquivo .exp
-    parser.add_argument("-a", "--arquivo", type=str, help="Arquivo de entrada com extensão .exp")
+def is_debugging():
+    return sys.gettrace() is not None
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Leitor de parâmetros para execução de arquivos .tot")
+
+    # Argumento obrigatório: arquivo .tot
+    parser.add_argument("-a", "--arquivo", type=str, help="Arquivo de entrada com extensão .tot")
 
     # Flags booleanas
     parser.add_argument("-p", "--processar", action="store_true", help="Executar o código do arquivo")
@@ -23,8 +28,8 @@ def parse_args():
     args = parser.parse_args()
 
     # Validação da extensão
-    if not args.arquivo.endswith(".exp"):
-        print("Erro: o arquivo deve ter extensão '.exp'")
+    if not args.arquivo.endswith(".tot"):
+        print("Erro: o arquivo deve ter extensão '.tot'")
         sys.exit(1)
 
     if not os.path.isfile(args.arquivo):
@@ -97,10 +102,11 @@ if __name__ == "__main__":
 
     args = parse_args()
 
-    print(f"Arquivo: {args.arquivo}")
-    print(f"Executar: {args.processar}")
-    print(f"Otimizar: {args.otimizar}")
-    print(f"Verbose: {args.verbose}")
+    if args.verbose:
+        print(f"Arquivo: {args.arquivo}")
+        print(f"Executar: {args.processar}")
+        print(f"Otimizar: {args.otimizar}")
+        print(f"Verbose: {args.verbose}")
 
     try:
         with open(args.arquivo, "r", encoding="utf-8") as f:
